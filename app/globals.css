@@ -1,0 +1,358 @@
+@import "tailwindcss";
+
+/* ================================================================== *
+ *  Skyline — Aurora UI weather
+ *  Style: Aurora UI — large flowing mesh gradients, subtle 8–12s
+ *  animation, depth via color layering, atmospheric & luminous.
+ *
+ *  LIGHT is the default theme (airy sky palette). A `.dark` class on
+ *  <html> swaps to a deep night-sky variant. Weather-mood accents are
+ *  driven by a small set of CSS variables set inline from the page.
+ * ================================================================== */
+
+:root {
+  /* ---- Design-system palette (authoritative) ---- */
+  --color-primary: #0284c7;
+  --color-on-primary: #ffffff;
+  --color-secondary: #0ea5e9;
+  --color-accent: #f59e0b;
+  --color-background: #f0f9ff;
+  --color-foreground: #0f172a;
+  --color-muted: #eff7fb;
+  --color-border: #e0f0f8;
+  --color-destructive: #dc2626;
+  --color-ring: #0284c7;
+
+  /* ---- Spacing tokens ---- */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* ---- Shadow depths ---- */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.1);
+  --shadow-xl: 0 20px 25px rgba(15, 23, 42, 0.15);
+
+  /* ---- Weather-mood atmosphere (LIGHT defaults; overridden inline) ---- */
+  --sky-top: #e6f4ff;
+  --sky-mid: #f0f9ff;
+  --sky-bottom: #ffffff;
+  --glow-1: #f59e0b; /* sun-amber accent bloom */
+  --glow-2: #0ea5e9; /* sky-blue atmospheric haze */
+
+  /* ---- Surface + ink tokens (LIGHT) ---- */
+  --bg: var(--color-background);
+  --ink: var(--color-foreground); /* primary readable text — passes 4.5:1 */
+  --ink-soft: #334155;
+  --ink-faint: #64748b;
+  --hairline: var(--color-border);
+  --pane: rgba(255, 255, 255, 0.66);
+  --pane-strong: rgba(255, 255, 255, 0.92);
+  --pane-border: rgba(2, 132, 199, 0.12);
+  --pane-shadow: var(--shadow-lg);
+  --grain-opacity: 0;
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* ---- Deep night-sky DARK variant ---- */
+.dark {
+  --sky-top: #0b1f3a;
+  --sky-mid: #0a1730;
+  --sky-bottom: #060c1c;
+  --glow-1: #f59e0b;
+  --glow-2: #0ea5e9;
+
+  --bg: #060c1c;
+  --ink: #f1f8fe;
+  --ink-soft: rgba(241, 248, 254, 0.74);
+  --ink-faint: rgba(241, 248, 254, 0.48);
+  --hairline: rgba(224, 240, 248, 0.14);
+  --pane: rgba(255, 255, 255, 0.06);
+  --pane-strong: rgba(255, 255, 255, 0.12);
+  --pane-border: rgba(224, 240, 248, 0.14);
+  --pane-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+  --grain-opacity: 0.05;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+/* color theme transition when toggling */
+html {
+  transition: background-color 300ms ease;
+}
+
+/* ================================================================== *
+ *  Atmosphere layers — Aurora mesh
+ * ================================================================== */
+
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    165deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 50%,
+    var(--sky-bottom) 100%
+  );
+  transition: background 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Flowing mesh-gradient blooms — the Northern-Lights effect. Several
+   overlapping radial layers, slowly morphing for an 8–12s feel. */
+.aurora {
+  position: fixed;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      40% 36% at 18% 16%,
+      color-mix(in srgb, var(--glow-1) 55%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      46% 42% at 86% 22%,
+      color-mix(in srgb, var(--color-secondary) 45%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      52% 48% at 78% 84%,
+      color-mix(in srgb, var(--glow-2) 50%, transparent) 0%,
+      transparent 74%
+    ),
+    radial-gradient(
+      44% 40% at 24% 88%,
+      color-mix(in srgb, var(--color-primary) 38%, transparent) 0%,
+      transparent 72%
+    );
+  filter: blur(40px) saturate(115%);
+  opacity: 0.9;
+  transition: background 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: aurora-drift 11s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(-2.5%, -1.5%, 0) scale(1.04) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(2%, 1%, 0) scale(1.09) rotate(0.6deg);
+  }
+  100% {
+    transform: translate3d(3.5%, 2.5%, 0) scale(1.12) rotate(-0.4deg);
+  }
+}
+
+/* subtle film grain — near-invisible in light, faint in dark for texture */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* soft vignette to seat the composition */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 6%,
+    transparent 58%,
+    color-mix(in srgb, var(--sky-bottom) 40%, transparent) 100%
+  );
+}
+
+/* ================================================================== *
+ *  Glass panes / cards
+ * ================================================================== */
+
+.pane {
+  background: var(--pane);
+  border: 1px solid var(--pane-border);
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--pane-shadow);
+  transition: box-shadow 200ms ease, transform 200ms ease, background 200ms ease;
+}
+
+.pane-soft {
+  background: var(--pane);
+  border: 1px solid var(--pane-border);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  backdrop-filter: blur(12px) saturate(130%);
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+/* Spec card hover (no layout-shifting scale) */
+.card-hover:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* ================================================================== *
+ *  Buttons (design-system specs)
+ * ================================================================== */
+
+.btn-accent {
+  background: var(--color-accent);
+  color: #1a1206;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  box-shadow: var(--shadow-md);
+}
+.btn-accent:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* ================================================================== *
+ *  Focus rings — visible for keyboard a11y
+ * ================================================================== */
+
+:where(button, a, input, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ring) 35%, transparent);
+  border-radius: 9999px;
+}
+.input-focus:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ring) 18%, transparent);
+}
+
+/* ================================================================== *
+ *  Load reveal + motion
+ * ================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.reveal {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes temp-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+    letter-spacing: -0.02em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: -0.04em;
+  }
+}
+.temp-in {
+  animation: temp-in 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ================================================================== *
+ *  Type
+ * ================================================================== */
+
+.display {
+  font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* the giant temperature numeral — mono for numeric precision */
+.hero-temp {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 500;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  text-shadow: 0 18px 60px rgba(2, 132, 199, 0.18);
+}
+.dark .hero-temp {
+  text-shadow: 0 18px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ================================================================== *
+ *  Scroll rail
+ * ================================================================== */
+
+.rail {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 40%, transparent)
+    transparent;
+}
+.rail::-webkit-scrollbar {
+  height: 7px;
+}
+.rail::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rail::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  border-radius: 9999px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  .aurora,
+  .reveal,
+  .temp-in,
+  .spin {
+    animation: none !important;
+    transition: none !important;
+  }
+}
