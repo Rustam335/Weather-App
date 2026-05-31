@@ -40,10 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local tooling / docs
-.claude/
-test/
-docs/
-
 # IDE
 .idea/
