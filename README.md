@@ -6,7 +6,9 @@ Skyline is a fast, fully client-side weather experience built with Next.js. Sear
 
 ## Screenshots
 
-<!-- add screenshot here -->
+| Light | Dark |
+| :---: | :---: |
+| ![Skyline — light mode](screenshots/light.png) | ![Skyline — dark mode](screenshots/dark.png) |
 
 ## Features
 
